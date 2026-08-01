@@ -28,5 +28,11 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+
+# Собранные бинарники
+bin/
+
+# Локальные заметки, не для репозитория
+*.local.md
