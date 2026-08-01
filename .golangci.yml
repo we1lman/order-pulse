@@ -1,0 +1,58 @@
+# Конфигурация golangci-lint v2.
+# Проверить версию: golangci-lint --version. Для v1 формат другой.
+
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  # standard = errcheck, govet, ineffassign, staticcheck, unused
+  default: standard
+  enable:
+    - bodyclose      # незакрытое тело ответа = утечка соединения
+    - contextcheck   # передача неверного контекста
+    - errorlint      # сравнение ошибок без errors.Is/As
+    - gosec          # типовые проблемы безопасности
+    - noctx          # HTTP-запросы без контекста
+    - nilerr         # return nil при ненулевой ошибке
+    - rowserrcheck   # необработанный rows.Err() в database/sql
+    - sqlclosecheck  # незакрытые rows/stmt
+    - copyloopvar    # избыточное копирование переменной цикла (Go 1.22+)
+    - prealloc       # срезы без предварительной аллокации в горячих местах
+    - unconvert      # бессмысленные конверсии типов
+    - wastedassign
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+    govet:
+      enable:
+        - shadow      # затенение переменных — источник тонких багов с err
+    gosec:
+      excludes:
+        - G104        # дублирует errcheck
+
+  exclusions:
+    generated: lax
+    rules:
+      # В тестах допускаем неполную обработку ошибок и «магические» значения.
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+      # Сгенерированный код из proto не наш — не линтуем.
+      - path: (^|/)(pb|gen)/
+        linters:
+          - all
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/we1lman/order-pulse
